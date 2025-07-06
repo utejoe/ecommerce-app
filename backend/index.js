@@ -1,5 +1,5 @@
 require("dotenv").config();
-const port = 3300;
+const PORT = process.env.PORT || 3000;
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -8,6 +8,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const cors = require("cors");
+const { type } = require("os");
 
 app.use(express.json());
 app.use(cors());
@@ -122,7 +123,7 @@ app.post("/upload", upload.single("product"), (req, res) => {
 
   res.json({
     success: 1,
-    image_url: `http://localhost:${port}/images/${req.file.filename}`,
+    image_url: `http://localhost:${PORT}/images/${req.file.filename}`,
   });
 });
 
@@ -174,11 +175,135 @@ app.get("/allproducts", async (req, res) => {
   }
 });
 
-// Start server
-app.listen(port, (error) => {
-  if (!error) {
-    console.log("Server Running on Port " + port);
+// Create schema and model for User
+
+const User = mongoose.model("Users", {
+  name: {
+    type: String,
+  },
+  email: {
+    type: String,
+    unique: true,
+  },
+  password: {
+    type: String,
+  },
+  cartData: {
+    type: Object,
+  },
+  date: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+// Creating Endpoint for registering the user
+app.post("/signup", async (req, res) => {
+  let check = await User.findOne({ email: req.body.email });
+  if (check) {
+    return res.status(400).json({
+      success: false,
+      errors: "Existing user found with same email address",
+    });
+  }
+
+  let cart = {};
+  for (let i = 0; i < 300; i++) {
+    cart[i] = 0;
+  }
+
+  const user = new User({
+    name: req.body.username,
+    email: req.body.email,
+    password: req.body.password,
+    cartData: cart,
+  });
+
+  await user.save();
+
+  const data = {
+    user: {
+      id: user.id,
+    },
+  };
+
+  const token = jwt.sign(data, "secret_ecom");
+  res.json({ success: true, token });
+});
+
+// Creating endpoint for user login
+app.post('/login', async (req, res) => {
+  let user = await User.findOne({ email: req.body.email });
+
+  if (user) {
+    const passCompare = req.body.password === user.password;
+
+    if (passCompare) {
+      const data = {
+        user: {
+          id: user.id
+        }
+      };
+
+      const token = jwt.sign(data, 'secret_ecom');
+      res.json({ success: true, token });
+    } else {
+      res.json({ success: false, errors: "Wrong Password" });
+    }
+
   } else {
-    console.log("Error : " + error);
+    res.json({ success: false, errors: "Wrong Email address" });
+  }
+});
+
+//Creating endpoint for newcollections data
+app.get("/newcollections", async (req, res) => {
+  try {
+    const products = await Product.find().sort({ id: 1 }); // Optional: sort by ID
+    const newcollection = products.slice(-8); // Get last 8 items
+    console.log(
+      "✅ [GET] /newcollections - Returned",
+      newcollection.length,
+      "items"
+    );
+    res.json({ success: true, products: newcollection });
+  } catch (error) {
+    console.error("❌ Error fetching new collections:", error.message);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch new collections" });
+  }
+});
+
+// ✅ Creating endpoint for popular in women
+app.get('/popularinwomen', async (req, res) => {
+  try {
+    const products = await Product.find({ category: "women" });
+
+    res.status(200).json({
+      success: true,
+      products,
+    });
+
+    console.log("[GET] /popularinwomen - Returned", products.length, "products");
+  } catch (error) {
+    console.error("❌ Error fetching popular women products:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch popular products for women",
+      error: error.message,
+    });
+  }
+});
+
+// Creating endpoint for adding products in cartdata
+
+// Start server
+app.listen(PORT, (error) => {
+  if (error) {
+    console.error("❌ Failed to start server:", error);
+  } else {
+    console.log(`✅ Server running at http://localhost:${PORT}`);
   }
 });

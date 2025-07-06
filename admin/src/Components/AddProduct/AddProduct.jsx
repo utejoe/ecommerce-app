@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import './AddProduct.css';
-import upload_area from '../../assets/upload_area.svg'; 
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+import upload_area from '../../assets/upload_area.svg';
+import { uploadImage, addProduct } from "../../services/api";  // ✅ import endpoints
 
 const AddProduct = () => {
   const [image, setImage] = useState(null);
@@ -31,7 +31,7 @@ const AddProduct = () => {
 
     let responseData;
     try {
-      const response = await fetch(`${baseURL}/upload`, {
+      const response = await fetch(uploadImage, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -52,7 +52,7 @@ const AddProduct = () => {
       };
 
       try {
-        const productRes = await fetch(`${baseURL}/addproduct`, {
+        const productRes = await fetch(addProduct, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
