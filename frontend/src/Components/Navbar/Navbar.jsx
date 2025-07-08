@@ -1,10 +1,10 @@
-import React, { useContext, useRef, useState, useEffect } from 'react';
-import './Navbar.css';
-import logo from '../Assets/logo.png';
-import cart_icon from '../Assets/cart_icon.png';
-import { Link, useNavigate } from 'react-router-dom';
-import { ShopContext } from '../../Context/ShopContext';
-import nav_dropdown from '../Assets/nav-dropdown.png';
+import React, { useContext, useRef, useState, useEffect } from "react";
+import "./Navbar.css";
+import logo from "../Assets/logo.png";
+import cart_icon from "../Assets/cart_icon.png";
+import { Link, useNavigate } from "react-router-dom";
+import { ShopContext } from "../../Context/ShopContext";
+import nav_dropdown from "../Assets/nav-dropdown.png";
 
 export const Navbar = ({ menu, SetMenu }) => {
   const { getTotalCartItems } = useContext(ShopContext);
@@ -15,19 +15,19 @@ export const Navbar = ({ menu, SetMenu }) => {
 
   useEffect(() => {
     const checkLogin = () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("auth-token"); // ✅ Correct key
       setIsLoggedIn(!!token);
     };
 
-    checkLogin(); // Initial check
+    checkLogin(); // ✅ Check on mount
 
-    // Listen for login event
+    // ✅ Listen to custom login event
     window.addEventListener("userLoggedIn", checkLogin);
 
     return () => {
       window.removeEventListener("userLoggedIn", checkLogin);
     };
-  }, []);  
+  }, []);
 
   const dropdown_toggle = (e) => {
     menuRef.current.classList.toggle("nav-menu-visible");
@@ -35,9 +35,9 @@ export const Navbar = ({ menu, SetMenu }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
-    navigate("/login");
+    localStorage.removeItem("auth-token"); // ✅ Clear auth-token
+    setIsLoggedIn(false); // ✅ Update UI state
+    navigate("/"); // ✅ Redirect to homepage
   };
 
   return (
@@ -94,7 +94,7 @@ export const Navbar = ({ menu, SetMenu }) => {
             <button>Login</button>
           </Link>
         )}
-        <Link to="cart">
+        <Link to="/cart">
           <img src={cart_icon} alt="Cart" />
         </Link>
         <div className="nav-cart-count">{getTotalCartItems()}</div>

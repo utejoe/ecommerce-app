@@ -33,9 +33,25 @@ export const LoginSignup = () => {
 
       if (data.success) {
         alert("✅ Login successful!");
-        localStorage.setItem("token", data.token); // optionally store token
+        localStorage.setItem("auth-token", data.token);
+
+        // ✅ Sync local cart to backend
+        const localCart = JSON.parse(localStorage.getItem("cart")) || {};
+        await fetch("http://localhost:3300/synccart", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": data.token,
+          },
+          body: JSON.stringify({ cart: localCart }),
+        });
+
+        // 🧹 Clear localStorage cart (optional but recommended)
+        localStorage.removeItem("cart");
+
+        // Notify ShopContext and redirect
         window.dispatchEvent(new Event("userLoggedIn"));
-        navigate("/"); // ✅ Redirect to homepage
+        navigate("/");
       } else {
         alert("❌ Login failed: " + data.errors);
       }
@@ -63,7 +79,7 @@ export const LoginSignup = () => {
 
       if (data.success) {
         alert("✅ Signup successful!");
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("auth-token", data.token); // ✅ required by ShopContext
         navigate("/"); // ✅ Redirect to homepage
       } else {
         alert("❌ Signup failed: " + data.errors);

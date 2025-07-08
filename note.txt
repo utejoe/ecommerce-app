@@ -1,0 +1,40 @@
+🧠 What We’ll Do Next (Guest User First)
+✅ Step 1: Persist Cart in localStorage
+Update your ShopContext.jsx with:
+
+Load cart from localStorage on page load.
+
+Save cart to localStorage every time it updates.
+
+✅ Step 2: Detect if user is logged in
+If not logged in → work only with localStorage.
+
+If logged in → sync localStorage to MongoDB on login, and start using backend.
+
+
+
+
+
+ Optional Next Step (Coming up next)
+When user logs in:
+
+Merge localStorage.cart into user.cartData.
+
+Then clear localStorage.
+
+If you want that flow now, I can code it too.
+
+✅ Summary: What's Done So Far
+ Cart persists in localStorage for guests ✅
+
+ Cart sends data to backend for logged-in users ✅
+
+ Backend stores cart in MongoDB ✅
+
+Let me know:
+
+Do you want to implement the merge cart on login next?
+
+Or handle the display of logged-in user’s cart from MongoDB?
+
+We can go step by step.

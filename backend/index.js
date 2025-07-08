@@ -189,7 +189,9 @@ const User = mongoose.model("Users", {
     type: String,
   },
   cartData: {
-    type: Object,
+    type: Map,
+    of: Number,
+    default: {},
   },
   date: {
     type: Date,
@@ -207,10 +209,7 @@ app.post("/signup", async (req, res) => {
     });
   }
 
-  let cart = {};
-  for (let i = 0; i < 300; i++) {
-    cart[i] = 0;
-  }
+  const cart = {}; // ✅ Start empty
 
   const user = new User({
     name: req.body.username,
@@ -297,7 +296,166 @@ app.get('/popularinwomen', async (req, res) => {
   }
 });
 
-// Creating endpoint for adding products in cartdata
+// ✅ Add product to user's cart using Map
+app.post("/addtocart", async (req, res) => {
+  console.log("🛒 Received cart request");
+
+  const token = req.header("auth-token");
+  if (!token)
+    return res
+      .status(401)
+      .json({ success: false, message: "No token provided" });
+
+  try {
+    const decoded = jwt.verify(token, "secret_ecom");
+    const userId = decoded.user.id;
+    const { itemId } = req.body;
+
+    console.log(`📦 User: ${userId}, Item ID: ${itemId}`);
+
+    const user = await User.findById(userId);
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+
+    // ✅ Ensure cartData is initialized as a Map
+    if (!user.cartData || !(user.cartData instanceof Map)) {
+      user.cartData = new Map();
+    }
+
+    const key = itemId.toString(); // Use string keys for consistency
+    const currentCount = user.cartData.get(key) || 0;
+    user.cartData.set(key, currentCount + 1);
+
+    await user.save();
+
+    // Convert Map to plain object before sending to client
+    res.json({ success: true, cart: Object.fromEntries(user.cartData) });
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// ✅ Sync guest cart to user's cartData in MongoDB
+app.post("/synccart", async (req, res) => {
+  const token = req.header("auth-token");
+  if (!token)
+    return res
+      .status(401)
+      .json({ success: false, message: "No token provided" });
+
+  try {
+    const decoded = jwt.verify(token, "secret_ecom");
+    const userId = decoded.user.id;
+    const { cart } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+
+    if (!user.cartData || !(user.cartData instanceof Map)) {
+      user.cartData = new Map();
+    }
+
+    for (const [itemId, quantity] of Object.entries(cart)) {
+      const key = itemId.toString();
+      if (quantity > 0) {
+        const existing = user.cartData.get(key) || 0;
+        user.cartData.set(key, existing + quantity);
+      } else {
+        user.cartData.delete(key); // 🧹 do not store or keep zero quantities
+      }
+    }
+
+    await user.save();
+    res.json({ success: true, cart: Object.fromEntries(user.cartData) });
+  } catch (error) {
+    console.error("❌ Error syncing cart:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+
+app.get("/getcart", async (req, res) => {
+  const token = req.header("auth-token");
+  if (!token)
+    return res.status(401).json({ success: false, message: "No token" });
+
+  try {
+    const decoded = jwt.verify(token, "secret_ecom");
+    const userId = decoded.user.id;
+
+    const user = await User.findById(userId);
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+
+    const filteredCart = Object.fromEntries(
+      Array.from(user.cartData).filter(([_, qty]) => qty > 0)
+    );
+    res.json({ success: true, cart: filteredCart });
+  } catch (error) {
+    console.error("Error fetching cart:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+
+app.post("/removefromcart", async (req, res) => {
+  const token = req.header("auth-token");
+  const { itemId } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, "secret_ecom");
+    const userId = decoded.user.id;
+    console.log("🔓 Decoded user ID:", userId);
+
+    const user = await User.findById(userId);
+    if (!user) {
+      console.warn("⚠️ User not found:", userId);
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    if (!user.cartData || !(user.cartData instanceof Map)) {
+      console.warn("📦 cartData not initialized as Map, reinitializing...");
+      user.cartData = new Map(); // fallback
+    }
+
+    const key = itemId.toString();
+    const currentQty = user.cartData.get(key) || 0;
+    const newQty = Math.max(currentQty - 1, 0);
+
+    if (newQty === 0) {
+      user.cartData.delete(key); // ✅ Clean: don't store 0s
+    } else {
+      user.cartData.set(key, newQty);
+    }
+
+    await user.save();
+    console.log(`🛒 Removed item ${itemId} → Qty now ${newQty}`);
+
+    res.json({
+      success: true,
+      message: "Item removed from cart",
+      cart: Object.fromEntries(user.cartData),
+    });
+  } catch (error) {
+    console.error("❌ Error in /removefromcart:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+});
+
 
 // Start server
 app.listen(PORT, (error) => {

@@ -13,3 +13,6 @@ backend/upload/
 # Ignore system files
 .DS_Store
 Thumbs.db
+
+
+backend/scripts/cleanCart.js
