@@ -6,6 +6,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    port: parseInt(process.env.PORT) || 5173
-  }
+    port: parseInt(process.env.PORT) || 5173,
+  },
+  preview: {
+    port: parseInt(process.env.PORT) || 4173,
+    host: '0.0.0.0',
+    allowedHosts: ['ecommerce-admin-lzar.onrender.com'],
+  },
 })
