@@ -17,7 +17,9 @@ const Hero = () => {
           <p>collections</p>
           <p>for everyone</p>
         </div>
-        <div className="hero-latest-btn">
+        <div className="hero-latest-btn" onClick={() => {
+          document.getElementById("latest-collection")?.scrollIntoView({ behavior: "smooth" });
+        }}>
           <div>Latest Collection</div>
           <img src={arrow_icon} alt="" />
         </div>
