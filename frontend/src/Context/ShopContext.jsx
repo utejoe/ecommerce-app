@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect } from "react";
-import all_product from "../Components/Assets/all_product";
 
 export const ShopContext = createContext(null);
 
@@ -14,7 +13,28 @@ const ShopContextProvider = (props) => {
     return localCart ? JSON.parse(localCart) : getDefaultCart();
   });
 
+  const [all_product, setAllProduct] = useState([]);
   const isLoggedIn = !!localStorage.getItem("auth-token");
+
+  // ✅ Fetch all products from backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("http://localhost:3300/allproducts");
+        const data = await res.json();
+        if (data.success) {
+          setAllProduct(data.products);
+          console.log("✅ Products fetched from backend");
+        } else {
+          console.error("❌ Backend returned error while fetching products");
+        }
+      } catch (error) {
+        console.error("❌ Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
@@ -46,7 +66,7 @@ const ShopContextProvider = (props) => {
         ...prev,
         [itemId]: Math.max((prev[itemId] || 0) - 1, 0),
       };
-      if (newCart[itemId] === 0) delete newCart[itemId]; // 🧹 remove zero items
+      if (newCart[itemId] === 0) delete newCart[itemId];
       return newCart;
     });
 
@@ -114,9 +134,7 @@ const ShopContextProvider = (props) => {
             );
             setCartItems(cleanedCart);
             localStorage.removeItem("cart");
-            console.log(
-              "✅ Cleaned and fetched cart from backend on initial load"
-            );
+            console.log("✅ Cleaned and fetched cart from backend on initial load");
           }
         })
         .catch((err) => {

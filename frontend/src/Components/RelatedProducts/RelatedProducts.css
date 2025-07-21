@@ -21,6 +21,52 @@
     display: flex;
     gap: 30px;
 }
+.carousel-controls {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 30px;
+  box-sizing: border-box;
+}
+
+.relatedproducts-item {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.relatedproducts-item::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-50%);
+  background-color: rgba(23, 23, 23, 0.6);
+  color: white;
+  border: none;
+  font-size: 22px;
+  padding: 10px 14px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 2;
+  transition: background-color 0.3s ease;
+}
+.carousel-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+.carousel-btn.left {
+  left: 0;
+}
+.carousel-btn.right {
+  right: 0;
+}
+
 @media(max-width : 1280px){
     .relatedproducts{
         height: 70vh;
