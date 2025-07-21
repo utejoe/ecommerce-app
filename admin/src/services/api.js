@@ -4,3 +4,5 @@ export const uploadImage = `${baseURL}/upload`;
 export const addProduct = `${baseURL}/addproduct`;
 export const allProducts = `${baseURL}/allproducts`;
 export const removeProduct = `${baseURL}/removeproduct`; // <-- ✅ used above
+
+console.log("✅ VITE_API_BASE_URL:", import.meta.env.VITE_API_BASE_URL);
