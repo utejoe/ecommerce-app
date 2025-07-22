@@ -6,9 +6,10 @@
 
 # Ignore dotenv environment files (we’ll use this for secrets)
 **/.env
+search-3300-results.txt
 
 # Ignore uploads folder if it shouldn't be public
-backend/upload/
+# backend/upload/
 
 # Ignore system files
 .DS_Store

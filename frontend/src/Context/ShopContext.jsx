@@ -1,11 +1,15 @@
 import React, { createContext, useState, useEffect } from "react";
+import {
+  allProductsAPI,
+  addToCartAPI,
+  removeFromCartAPI,
+  getCartAPI,
+  // syncCartAPI,
+} from "../services/api";
 
 export const ShopContext = createContext(null);
 
-// ✅ Clean cart initialization (no zeros for unused products)
-const getDefaultCart = () => {
-  return {};
-};
+const getDefaultCart = () => ({});
 
 const ShopContextProvider = (props) => {
   const [cartItems, setCartItems] = useState(() => {
@@ -16,11 +20,10 @@ const ShopContextProvider = (props) => {
   const [all_product, setAllProduct] = useState([]);
   const isLoggedIn = !!localStorage.getItem("auth-token");
 
-  // ✅ Fetch all products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("https://ecommerce-app-ccnh.onrender.com/");
+        const res = await fetch(allProductsAPI);
         const data = await res.json();
         if (data.success) {
           setAllProduct(data.products);
@@ -47,7 +50,7 @@ const ShopContextProvider = (props) => {
     }));
 
     if (isLoggedIn) {
-      await fetch("https://ecommerce-app-ccnh.onrender.com/addtocart", {
+      await fetch(addToCartAPI, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,7 +75,7 @@ const ShopContextProvider = (props) => {
 
     if (isLoggedIn) {
       try {
-        await fetch("https://ecommerce-app-ccnh.onrender.com/removefromcart", {
+        await fetch(removeFromCartAPI, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -86,14 +89,13 @@ const ShopContextProvider = (props) => {
     }
   };
 
-  // ✅ On login sync — clean backend cart before set
   useEffect(() => {
     const handleLogin = async () => {
       const token = localStorage.getItem("auth-token");
       if (!token) return;
 
       try {
-        const res = await fetch("https://ecommerce-app-ccnh.onrender.com/getcart", {
+        const res = await fetch(getCartAPI, {
           headers: {
             "auth-token": token,
           },
@@ -119,11 +121,10 @@ const ShopContextProvider = (props) => {
     };
   }, []);
 
-  // ✅ On reload if already logged in
   useEffect(() => {
     const token = localStorage.getItem("auth-token");
     if (token) {
-      fetch("https://ecommerce-app-ccnh.onrender.com/getcart", {
+      fetch(getCartAPI, {
         headers: { "auth-token": token },
       })
         .then((res) => res.json())

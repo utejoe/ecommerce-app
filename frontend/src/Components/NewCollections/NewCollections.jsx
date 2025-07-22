@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./NewCollections.css";
 import Item from "../Item/Item";
+import { newCollectionsAPI } from "../../services/api";
 
 const NewCollections = () => {
   const [new_collection, setNew_collection] = useState([]);
@@ -8,7 +9,7 @@ const NewCollections = () => {
   useEffect(() => {
     const fetchNewCollections = async () => {
       try {
-        const res = await fetch("https://ecommerce-app-ccnh.onrender.com/newcollections");
+        const res = await fetch(newCollectionsAPI);
         const data = await res.json();
 
         if (data.success) {

@@ -2,18 +2,18 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./Popular.css";
 import Item from "../Item/Item";
+import { popularWomenAPI, getImageURL } from "../../services/api";
 
 const Popular = () => {
   const [popularItems, setPopularItems] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
   const carouselRef = useRef(null);
   const intervalRef = useRef(null);
-  const itemsPerPage = 4; // Adjust to match your design
+  const scrollAmount = 300;
 
   useEffect(() => {
     const fetchPopularItems = async () => {
       try {
-        const res = await fetch("https://ecommerce-app-ccnh.onrender.com/popularinwomen");
+        const res = await fetch(popularWomenAPI);
         const data = await res.json();
         if (data.success) {
           setPopularItems(data.products);
@@ -28,57 +28,38 @@ const Popular = () => {
     fetchPopularItems();
   }, []);
 
-  const totalPages = Math.ceil(popularItems.length / itemsPerPage);
-
-  const scrollToPage = (pageIndex) => {
-    const container = carouselRef.current;
-    if (!container) return;
-    const scrollAmount = container.offsetWidth;
-    container.scrollTo({ left: scrollAmount * pageIndex, behavior: "smooth" });
-    setCurrentPage(pageIndex);
-  };
-
   const scrollRight = () => {
-    if (currentPage < totalPages - 1) {
-      scrollToPage(currentPage + 1);
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
 
   const scrollLeft = () => {
-    if (currentPage > 0) {
-      scrollToPage(currentPage - 1);
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
     }
   };
 
-  // Auto-scroll
   useEffect(() => {
     intervalRef.current = setInterval(() => {
-      setCurrentPage((prevPage) =>
-        prevPage < totalPages - 1 ? prevPage + 1 : 0
-      );
+      scrollRight();
     }, 4000);
 
     return () => clearInterval(intervalRef.current);
-  }, [totalPages]);
-
-  useEffect(() => {
-    scrollToPage(currentPage);
-  }, [currentPage]);
+  }, [popularItems]);
 
   return (
     <div className="popular">
       <h1>POPULAR IN WOMEN</h1>
       <hr />
-
       <div className="carousel-controls">
         <button className="carousel-btn left" onClick={scrollLeft}>
           &#10094;
         </button>
-
         <div className="popular-item" ref={carouselRef}>
-          {popularItems.map((item, i) => (
+          {popularItems.map((item) => (
             <Item
-              key={i}
+              key={item.id}
               id={item.id}
               name={item.name}
               image={item.image}
@@ -87,21 +68,9 @@ const Popular = () => {
             />
           ))}
         </div>
-
         <button className="carousel-btn right" onClick={scrollRight}>
           &#10095;
         </button>
-      </div>
-
-      {/* Dots */}
-      <div className="carousel-dots">
-        {Array.from({ length: totalPages }).map((_, index) => (
-          <div
-            key={index}
-            className={`dot ${index === currentPage ? "active" : ""}`}
-            onClick={() => scrollToPage(index)}
-          ></div>
-        ))}
       </div>
     </div>
   );
