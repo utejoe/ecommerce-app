@@ -487,7 +487,7 @@ app.get("/userinfo", async (req, res) => {
         name: user.name,
         email: user.email,
         profileImage: user.profileImage,
-        isAdmin: user.email === ADMIN_EMAIL, // Optional admin check
+        isAdmin: user.email === "admin@example.com", // Optional admin check
       },
     });
   } catch (error) {

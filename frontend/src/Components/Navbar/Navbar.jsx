@@ -1,10 +1,10 @@
+// frontend/src/Components/Navbar/Navbar.jsx
 import React, { useContext, useRef, useState, useEffect } from "react";
 import "./Navbar.css";
 import logo from "../Assets/logo.png";
 import cart_icon from "../Assets/cart_icon.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
-
 import { ShopContext } from "../../Context/ShopContext";
 import nav_dropdown from "../Assets/nav-dropdown.png";
 
@@ -13,21 +13,38 @@ export const Navbar = ({ menu, SetMenu }) => {
   const menuRef = useRef();
   const navigate = useNavigate();
 
+  const location = useLocation();
+
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.startsWith("/men")) SetMenu("men");
+    else if (path.startsWith("/women")) SetMenu("women");
+    else if (path.startsWith("/kids")) SetMenu("kids");
+    else SetMenu("shop");
+  }, [location.pathname, SetMenu]);
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
     const checkLogin = () => {
-      const token = localStorage.getItem("auth-token"); // ✅ Correct key
+      const token = localStorage.getItem("auth-token");
       setIsLoggedIn(!!token);
+
+      // Update profile image if available
+      const storedImage = localStorage.getItem("profile-image");
+      setProfileImage(storedImage || null);
     };
 
-    checkLogin(); // ✅ Check on mount
+    checkLogin(); // Initial check
 
-    // ✅ Listen to custom login event
+    // Listen to custom login or image update events
     window.addEventListener("userLoggedIn", checkLogin);
+    window.addEventListener("profileImageUpdated", checkLogin);
 
     return () => {
       window.removeEventListener("userLoggedIn", checkLogin);
+      window.removeEventListener("profileImageUpdated", checkLogin);
     };
   }, []);
 
@@ -37,9 +54,15 @@ export const Navbar = ({ menu, SetMenu }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("auth-token"); // ✅ Clear auth-token
-    setIsLoggedIn(false); // ✅ Update UI state
-    navigate("/"); // ✅ Redirect to homepage
+    localStorage.removeItem("auth-token");
+    localStorage.removeItem("profile-image");
+    setIsLoggedIn(false);
+    setProfileImage(null);
+    navigate("/");
+  };
+
+  const handleImageError = () => {
+    setProfileImage(null); // Fallback to default icon
   };
 
   return (
@@ -69,19 +92,19 @@ export const Navbar = ({ menu, SetMenu }) => {
           {menu === "shop" && <hr />}
         </li>
         <li onClick={() => SetMenu("men")}>
-          <Link style={{ textDecoration: "none" }} to="men">
+          <Link style={{ textDecoration: "none" }} to="/men">
             Men
           </Link>
           {menu === "men" && <hr />}
         </li>
         <li onClick={() => SetMenu("women")}>
-          <Link style={{ textDecoration: "none" }} to="women">
+          <Link style={{ textDecoration: "none" }} to="/women">
             Women
           </Link>
           {menu === "women" && <hr />}
         </li>
         <li onClick={() => SetMenu("kids")}>
-          <Link style={{ textDecoration: "none" }} to="kids">
+          <Link style={{ textDecoration: "none" }} to="/kids">
             Kids
           </Link>
           {menu === "kids" && <hr />}
@@ -92,10 +115,11 @@ export const Navbar = ({ menu, SetMenu }) => {
         {isLoggedIn ? (
           <>
             <Link to="/profile" className="profile-icon-link">
-              {localStorage.getItem("profile-image") ? (
+              {profileImage ? (
                 <img
-                  src={localStorage.getItem("profile-image")}
+                  src={profileImage}
                   alt="Profile"
+                  onError={handleImageError}
                   className="profile-icon-img"
                 />
               ) : (

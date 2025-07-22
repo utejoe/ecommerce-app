@@ -24,13 +24,58 @@ const RelatedProducts = ({ category, currentProductId }) => {
     carouselRef.current?.scrollBy({ left: 300, behavior: "smooth" });
   };
 
+  // Autoscroll every 4 seconds
   useEffect(() => {
-    intervalRef.current = setInterval(() => {
-      scrollRight();
-    }, 4000);
-
+    if (related.length > 0) {
+      intervalRef.current = setInterval(scrollRight, 4000);
+    }
     return () => clearInterval(intervalRef.current);
   }, [related]);
+
+  // Touch-drag scroll support
+  useEffect(() => {
+    const container = carouselRef.current;
+    if (!container) return;
+
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    const start = (e) => {
+      isDown = true;
+      startX = e.pageX || e.touches[0].pageX;
+      scrollLeft = container.scrollLeft;
+    };
+
+    const move = (e) => {
+      if (!isDown) return;
+      const x = e.pageX || e.touches[0].pageX;
+      const walk = x - startX;
+      container.scrollLeft = scrollLeft - walk;
+    };
+
+    const end = () => {
+      isDown = false;
+    };
+
+    container.addEventListener("mousedown", start);
+    container.addEventListener("touchstart", start);
+    container.addEventListener("mousemove", move);
+    container.addEventListener("touchmove", move);
+    container.addEventListener("mouseup", end);
+    container.addEventListener("mouseleave", end);
+    container.addEventListener("touchend", end);
+
+    return () => {
+      container.removeEventListener("mousedown", start);
+      container.removeEventListener("touchstart", start);
+      container.removeEventListener("mousemove", move);
+      container.removeEventListener("touchmove", move);
+      container.removeEventListener("mouseup", end);
+      container.removeEventListener("mouseleave", end);
+      container.removeEventListener("touchend", end);
+    };
+  }, []);
 
   return (
     <div className="relatedproducts">

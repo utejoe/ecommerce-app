@@ -58,8 +58,15 @@ const ShopCategory = (props) => {
         />
       )}
 
-      <div className="shopcategory-loadmore">Explore More</div>
-    </div>
+      {currentPage < totalPages && (
+        <div
+          className="shopcategory-loadmore"
+          onClick={() => setCurrentPage((prev) => prev + 1)}
+        >
+          Explore More
+        </div>
+      )}
+    </div> 
   );
 };
 

@@ -44,6 +44,7 @@ const Profile = () => {
           // Sync to localStorage for navbar
           if (data.user.profileImage) {
             localStorage.setItem("profile-image", data.user.profileImage);
+            window.dispatchEvent(new Event("profileImageUpdated"));
           }
         } else {
           alert("Failed to fetch user info.");
