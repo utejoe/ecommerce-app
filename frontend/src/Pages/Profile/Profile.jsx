@@ -12,9 +12,15 @@ const Profile = () => {
     getTotalCartAmount,
   } = useContext(ShopContext);
 
-  const [user, setUser] = useState({ name: "Loading...", isAdmin: false });
+  const [user, setUser] = useState({
+    name: "Loading...",
+    isAdmin: false,
+    profileImage: "",
+  });
 
-  // 🔄 Load user data dynamically
+  const [imageFile, setImageFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(""); // for live preview
+
   useEffect(() => {
     const token = localStorage.getItem("auth-token");
     if (!token) {
@@ -24,14 +30,21 @@ const Profile = () => {
     }
 
     fetch(`${process.env.REACT_APP_API_BASE_URL}/userinfo`, {
-      headers: {
-        "auth-token": token,
-      },
+      headers: { "auth-token": token },
     })
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          setUser({ name: data.user.name, isAdmin: data.user.isAdmin });
+          setUser({
+            name: data.user.name,
+            isAdmin: data.user.isAdmin,
+            profileImage: data.user.profileImage || "",
+          });
+
+          // Sync to localStorage for navbar
+          if (data.user.profileImage) {
+            localStorage.setItem("profile-image", data.user.profileImage);
+          }
         } else {
           alert("Failed to fetch user info.");
         }
@@ -41,9 +54,98 @@ const Profile = () => {
       });
   }, [navigate]);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setImageFile(file);
+
+    const tempUrl = URL.createObjectURL(file);
+    setPreviewUrl(tempUrl); // set preview immediately
+
+    // Optional: clean up object URL later
+    return () => URL.revokeObjectURL(tempUrl);
+  };
+
+  const handleUpload = async () => {
+    if (!imageFile) {
+      alert("Please select an image.");
+      return;
+    }
+
+    const token = localStorage.getItem("auth-token");
+    const formData = new FormData();
+    formData.append("image", imageFile);
+
+    try {
+      // Step 1: Upload image
+      const uploadRes = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/upload-profile-image`,
+        {
+          method: "POST",
+          headers: {
+            "auth-token": token,
+          },
+          body: formData,
+        }
+      );
+
+      const uploadData = await uploadRes.json();
+      if (!uploadData.success) {
+        alert("Failed to upload image file.");
+        return;
+      }
+
+      const imageUrl = uploadData.imageUrl;
+
+      // Step 2: Save image URL to MongoDB
+      const saveRes = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/save-profile-image`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": token,
+          },
+          body: JSON.stringify({ imageUrl }),
+        }
+      );
+
+      const saveData = await saveRes.json();
+
+      if (saveData.success) {
+        setUser((prev) => ({ ...prev, profileImage: imageUrl }));
+        localStorage.setItem("profile-image", imageUrl);
+        alert("✅ Profile image updated!");
+        setPreviewUrl(""); // clear temp preview after save
+      } else {
+        alert("❌ Failed to save image URL.");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("❌ Something went wrong.");
+    }
+  };
+
   return (
     <div className="profile">
       <h1>Welcome, {user.name}</h1>
+
+      <div className="profile-image-section">
+        <img
+          src={
+            previewUrl
+              ? previewUrl
+              : user.profileImage
+              ? `${user.profileImage}?t=${Date.now()}`
+              : "/default-avatar.png"
+          }
+          alt="Profile"
+          className="profile-avatar"
+        />
+        <input type="file" accept="image/*" onChange={handleImageChange} />
+        <button onClick={handleUpload}>Upload Profile Image</button>
+      </div>
 
       <div className="cart-summary">
         <h2>Your Cart</h2>

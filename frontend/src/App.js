@@ -13,6 +13,7 @@ import men_banner from './Components/Assets/banner_mens.png';
 import women_banner from './Components/Assets/banner_women.png';
 import kid_banner from './Components/Assets/banner_kids.png';
 import Profile from "./Pages/Profile/Profile";
+import Admin from "./Pages/Admin/AdminPanel"; 
 
 function App() {
   const [menu, SetMenu] = useState("shop");
@@ -40,6 +41,7 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<LoginSignup />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/admin/*" element={<Admin />} />
         </Routes>
         <Footer SetMenu={SetMenu} />
       </BrowserRouter>

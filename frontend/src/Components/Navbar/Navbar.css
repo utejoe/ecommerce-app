@@ -83,14 +83,32 @@
 .nav-dropdown{
     display: none;
 }
+
+.profile-icon-link {
+  color: #333;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.profile-icon-link:hover {
+  color: #ff4141;
+}
+
 .profile-icon {
   width: 32px;
   height: 32px;
-  margin-left: 10px;
-  border-radius: 50%;
-  background-color: #ccc;
-  border: 1px solid #888;
 }
+
+.profile-icon-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+
 
 @media(max-width: 1280px){
     .navbar{

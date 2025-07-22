@@ -3,6 +3,8 @@ import "./Navbar.css";
 import logo from "../Assets/logo.png";
 import cart_icon from "../Assets/cart_icon.png";
 import { Link, useNavigate } from "react-router-dom";
+import { FaUserCircle } from "react-icons/fa";
+
 import { ShopContext } from "../../Context/ShopContext";
 import nav_dropdown from "../Assets/nav-dropdown.png";
 
@@ -88,7 +90,20 @@ export const Navbar = ({ menu, SetMenu }) => {
 
       <div className="nav-login-cart">
         {isLoggedIn ? (
-          <button onClick={handleLogout}>Logout</button>
+          <>
+            <Link to="/profile" className="profile-icon-link">
+              {localStorage.getItem("profile-image") ? (
+                <img
+                  src={localStorage.getItem("profile-image")}
+                  alt="Profile"
+                  className="profile-icon-img"
+                />
+              ) : (
+                <FaUserCircle className="profile-icon" />
+              )}
+            </Link>
+            <button onClick={handleLogout}>Logout</button>
+          </>
         ) : (
           <Link to="/login">
             <button>Login</button>

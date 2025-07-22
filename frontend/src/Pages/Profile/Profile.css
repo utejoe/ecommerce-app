@@ -1,51 +1,224 @@
+/* === Profile Base === */
 .profile {
-  padding: 40px;
-  max-width: 800px;
-  margin: auto;
-}
-.profile h1 {
-  font-size: 40px;
-  margin-bottom: 20px;
-  color: #171717;
-}
-.profile h2 {
-  font-size: 28px;
-  margin-bottom: 10px;
-}
-.cart-list {
-  list-style: none;
-  padding: 0;
-}
-.cart-list li {
-  padding: 10px 0;
-  font-size: 18px;
-  border-bottom: 1px solid #ddd;
-}
-.admin-btn {
-  margin-top: 30px;
-  padding: 12px 24px;
-  background-color: #ff4141;
-  color: white;
-  border: none;
-  font-size: 16px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-.admin-btn:hover {
-  background-color: #e63939;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
 }
 
-/* Media Queries */
-@media (max-width: 1280px) {
-  .profile h1 { font-size: 32px; }
+.profile h1 {
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
 }
-@media (max-width: 1024px) {
-  .profile h1 { font-size: 28px; }
+
+/* === Profile Image Section === */
+.profile-image-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+  gap: 12px;
 }
-@media (max-width: 800px) {
-  .profile { padding: 20px; }
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ccc;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
-@media (max-width: 500px) {
-  .profile h1 { font-size: 20px; }
-  .cart-list li { font-size: 14px; }
+
+.profile-image-section input[type="file"] {
+  font-size: 0.9rem;
+}
+
+.profile-image-section button {
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.profile-image-section button:hover {
+  background-color: #555;
+}
+
+/* === Cart Summary === */
+.cart-summary {
+  margin-top: 30px;
+  padding: 20px;
+  border-top: 2px solid #eee;
+}
+
+.cart-summary h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+.cart-summary p {
+  font-size: 1rem;
+  margin: 5px 0;
+}
+
+.cart-list {
+  margin-top: 15px;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.cart-list li {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+/* === Admin Button === */
+.admin-btn {
+  margin-top: 30px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  background-color: #111;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.admin-btn:hover {
+  background-color: #333;
+}
+
+/* ============================== */
+/* === Responsive Breakpoints === */
+/* ============================== */
+
+/* ≤1280px */
+@media screen and (max-width: 1280px) {
+  .profile {
+    max-width: 85%;
+    padding: 25px;
+  }
+
+  .profile h1 {
+    font-size: 2rem;
+  }
+
+  .cart-summary h2 {
+    font-size: 1.4rem;
+  }
+
+  .cart-summary p,
+  .cart-list li {
+    font-size: 0.95rem;
+  }
+}
+
+/* ≤1024px */
+@media screen and (max-width: 1024px) {
+  .profile {
+    padding: 20px;
+  }
+
+  .profile h1 {
+    font-size: 1.8rem;
+  }
+
+  .cart-summary h2 {
+    font-size: 1.3rem;
+  }
+
+  .admin-btn {
+    font-size: 0.95rem;
+    padding: 10px 18px;
+  }
+}
+
+/* ≤800px */
+@media screen and (max-width: 800px) {
+  .profile {
+    padding: 18px;
+  }
+
+  .profile h1 {
+    font-size: 1.6rem;
+  }
+
+  .cart-summary h2 {
+    font-size: 1.2rem;
+  }
+
+  .cart-summary p,
+  .cart-list li {
+    font-size: 0.9rem;
+  }
+
+  .admin-btn {
+    font-size: 0.9rem;
+    padding: 10px 16px;
+  }
+
+  .profile-avatar {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  }
+}
+
+/* ≤500px */
+@media screen and (max-width: 500px) {
+  .profile {
+    padding: 15px;
+  }
+
+  .profile h1 {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+
+  .cart-summary h2 {
+    font-size: 1.1rem;
+    text-align: center;
+  }
+
+  .cart-summary p {
+    text-align: center;
+  }
+
+  .cart-list {
+    padding-left: 15px;
+  }
+
+  .cart-list li {
+    font-size: 0.85rem;
+  }
+
+  .admin-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    font-size: 0.9rem;
+    margin-top: 20px;
+  }
+
+  .profile-image-section button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .profile-avatar {
+    width: 90px;
+    height: 90px;
+  }
 }

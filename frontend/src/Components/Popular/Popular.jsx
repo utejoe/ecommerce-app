@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./Popular.css";
 import Item from "../Item/Item";
-import { popularWomenAPI, getImageURL } from "../../services/api";
+import { popularWomenAPI } from "../../services/api";
 
 const Popular = () => {
   const [popularItems, setPopularItems] = useState([]);
@@ -47,6 +47,51 @@ const Popular = () => {
 
     return () => clearInterval(intervalRef.current);
   }, [popularItems]);
+
+  // ✅ Add this drag-to-scroll effect
+  useEffect(() => {
+    const container = carouselRef.current;
+    if (!container) return;
+
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    const start = (e) => {
+      isDown = true;
+      startX = e.pageX || e.touches[0].pageX;
+      scrollLeft = container.scrollLeft;
+    };
+
+    const move = (e) => {
+      if (!isDown) return;
+      const x = e.pageX || e.touches[0].pageX;
+      const walk = x - startX;
+      container.scrollLeft = scrollLeft - walk;
+    };
+
+    const end = () => {
+      isDown = false;
+    };
+
+    container.addEventListener("mousedown", start);
+    container.addEventListener("touchstart", start);
+    container.addEventListener("mousemove", move);
+    container.addEventListener("touchmove", move);
+    container.addEventListener("mouseup", end);
+    container.addEventListener("mouseleave", end);
+    container.addEventListener("touchend", end);
+
+    return () => {
+      container.removeEventListener("mousedown", start);
+      container.removeEventListener("touchstart", start);
+      container.removeEventListener("mousemove", move);
+      container.removeEventListener("touchmove", move);
+      container.removeEventListener("mouseup", end);
+      container.removeEventListener("mouseleave", end);
+      container.removeEventListener("touchend", end);
+    };
+  }, []);
 
   return (
     <div className="popular">
