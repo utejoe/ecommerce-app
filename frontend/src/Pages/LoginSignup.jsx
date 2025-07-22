@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import "./CSS/LoginSignup.css";
-import { useNavigate } from "react-router-dom"; // ✅ Import navigate
+import { useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // ✅ Eye icons
+
+const baseURL = process.env.REACT_APP_API_BASE_URL;
 
 export const LoginSignup = () => {
   const [state, setState] = useState("Login");
@@ -9,16 +12,21 @@ export const LoginSignup = () => {
     password: "",
     email: "",
   });
+  const [showPassword, setShowPassword] = useState(false); // 👁 Toggle state
 
-  const navigate = useNavigate(); // ✅ Use the hook
+  const navigate = useNavigate();
 
   const changeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   const login = async () => {
     try {
-      const res = await fetch("http://localhost:3300/login", {
+      const res = await fetch(`${baseURL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,9 +43,9 @@ export const LoginSignup = () => {
         alert("✅ Login successful!");
         localStorage.setItem("auth-token", data.token);
 
-        // ✅ Sync local cart to backend
         const localCart = JSON.parse(localStorage.getItem("cart")) || {};
-        await fetch("http://localhost:3300/synccart", {
+
+        await fetch(`${baseURL}/synccart`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -46,10 +54,8 @@ export const LoginSignup = () => {
           body: JSON.stringify({ cart: localCart }),
         });
 
-        // 🧹 Clear localStorage cart (optional but recommended)
         localStorage.removeItem("cart");
 
-        // Notify ShopContext and redirect
         window.dispatchEvent(new Event("userLoggedIn"));
         navigate("/");
       } else {
@@ -63,7 +69,7 @@ export const LoginSignup = () => {
 
   const signup = async () => {
     try {
-      const res = await fetch("http://localhost:3300/signup", {
+      const res = await fetch(`${baseURL}/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -79,8 +85,8 @@ export const LoginSignup = () => {
 
       if (data.success) {
         alert("✅ Signup successful!");
-        localStorage.setItem("auth-token", data.token); // ✅ required by ShopContext
-        navigate("/"); // ✅ Redirect to homepage
+        localStorage.setItem("auth-token", data.token);
+        navigate("/");
       } else {
         alert("❌ Signup failed: " + data.errors);
       }
@@ -112,13 +118,20 @@ export const LoginSignup = () => {
             type="email"
             placeholder="Email Address"
           />
-          <input
-            name="password"
-            value={formData.password}
-            onChange={changeHandler}
-            type="password"
-            placeholder="Password"
-          />
+
+          {/* Password field with eye toggle */}
+          <div className="password-wrapper">
+            <input
+              name="password"
+              value={formData.password}
+              onChange={changeHandler}
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+            />
+            <span onClick={togglePasswordVisibility} className="eye-icon">
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
         </div>
 
         <button onClick={() => (state === "Login" ? login() : signup())}>

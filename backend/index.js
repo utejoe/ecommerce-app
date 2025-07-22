@@ -456,6 +456,39 @@ app.post("/removefromcart", async (req, res) => {
   }
 });
 
+app.get("/userinfo", async (req, res) => {
+  const token = req.header("auth-token");
+  if (!token) {
+    return res
+      .status(401)
+      .json({ success: false, message: "No auth token provided" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, "secret_ecom");
+    const userId = decoded.user.id;
+
+    const user = await User.findById(userId).select("name email"); // Add isAdmin when available
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({
+      success: true,
+      user: {
+        name: user.name,
+        email: user.email,
+        isAdmin: user.email === "admin@example.com", // Simple admin check (optional)
+      },
+    });
+  } catch (error) {
+    console.error("❌ Error in /userinfo:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+
 
 // Start server
 app.listen(PORT, (error) => {

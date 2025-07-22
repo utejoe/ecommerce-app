@@ -83,6 +83,15 @@
 .nav-dropdown{
     display: none;
 }
+.profile-icon {
+  width: 32px;
+  height: 32px;
+  margin-left: 10px;
+  border-radius: 50%;
+  background-color: #ccc;
+  border: 1px solid #888;
+}
+
 @media(max-width: 1280px){
     .navbar{
         padding: 12px 50px;

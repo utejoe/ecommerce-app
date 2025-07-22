@@ -12,6 +12,7 @@ import Footer from "./Components/Footer/Footer";
 import men_banner from './Components/Assets/banner_mens.png';
 import women_banner from './Components/Assets/banner_women.png';
 import kid_banner from './Components/Assets/banner_kids.png';
+import Profile from "./Pages/Profile/Profile";
 
 function App() {
   const [menu, SetMenu] = useState("shop");
@@ -38,6 +39,7 @@ function App() {
           <Route path="/product/:productId" element={<Product />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<LoginSignup />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
         <Footer SetMenu={SetMenu} />
       </BrowserRouter>
