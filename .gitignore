@@ -8,7 +8,7 @@
 **/.env
 
 # Ignore uploads folder if it shouldn't be public
-# backend/upload/
+backend/upload/
 
 # Ignore system files
 .DS_Store
