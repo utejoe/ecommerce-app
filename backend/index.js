@@ -8,6 +8,8 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const cors = require("cors");
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+
 const { type } = require("os");
 
 app.use(express.json());
@@ -485,7 +487,7 @@ app.get("/userinfo", async (req, res) => {
         name: user.name,
         email: user.email,
         profileImage: user.profileImage,
-        isAdmin: user.email === "admin@example.com", // Optional admin check
+        isAdmin: user.email === ADMIN_EMAIL, // Optional admin check
       },
     });
   } catch (error) {
