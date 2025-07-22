@@ -193,11 +193,16 @@ const User = mongoose.model("Users", {
     of: Number,
     default: {},
   },
+  profileImage: {
+    type: String,
+    default: "",
+  },
   date: {
     type: Date,
     default: Date.now,
   },
 });
+
 
 // Creating Endpoint for registering the user
 app.post("/signup", async (req, res) => {
@@ -468,7 +473,7 @@ app.get("/userinfo", async (req, res) => {
     const decoded = jwt.verify(token, "secret_ecom");
     const userId = decoded.user.id;
 
-    const user = await User.findById(userId).select("name email"); // Add isAdmin when available
+    const user = await User.findById(userId).select("name email profileImage"); // Add isAdmin when available
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
@@ -479,7 +484,8 @@ app.get("/userinfo", async (req, res) => {
       user: {
         name: user.name,
         email: user.email,
-        isAdmin: user.email === "admin@example.com", // Simple admin check (optional)
+        profileImage: user.profileImage,
+        isAdmin: user.email === "admin@example.com", // Optional admin check
       },
     });
   } catch (error) {
@@ -504,6 +510,33 @@ app.post("/upload-profile-image", upload.single("image"), (req, res) => {
     imageUrl,
   });
 });
+
+app.post("/save-profile-image", async (req, res) => {
+  const token = req.header("auth-token");
+  if (!token) {
+    return res.status(401).json({ success: false, message: "No token provided" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, "secret_ecom");
+    const userId = decoded.user.id;
+    const { imageUrl } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    user.profileImage = imageUrl;
+    await user.save();
+
+    res.json({ success: true, message: "Profile image saved" });
+  } catch (error) {
+    console.error("❌ Error saving profile image:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 
 
 
