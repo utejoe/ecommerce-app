@@ -488,6 +488,24 @@ app.get("/userinfo", async (req, res) => {
   }
 });
 
+// 🔧 Upload profile image and return URL
+app.post("/upload-profile-image", upload.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      message: "No file uploaded",
+    });
+  }
+
+  const imageUrl = `${process.env.BASE_URL}/images/${req.file.filename}`;
+
+  return res.json({
+    success: true,
+    imageUrl,
+  });
+});
+
+
 
 
 // Start server
