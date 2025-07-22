@@ -8,7 +8,7 @@ const NewCollections = () => {
   useEffect(() => {
     const fetchNewCollections = async () => {
       try {
-        const res = await fetch("http://localhost:3300/newcollections");
+        const res = await fetch("https://ecommerce-app-ccnh.onrender.com/newcollections");
         const data = await res.json();
 
         if (data.success) {

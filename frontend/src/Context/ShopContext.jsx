@@ -20,7 +20,7 @@ const ShopContextProvider = (props) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:3300/allproducts");
+        const res = await fetch("https://ecommerce-app-ccnh.onrender.com/");
         const data = await res.json();
         if (data.success) {
           setAllProduct(data.products);
@@ -47,7 +47,7 @@ const ShopContextProvider = (props) => {
     }));
 
     if (isLoggedIn) {
-      await fetch("http://localhost:3300/addtocart", {
+      await fetch("https://ecommerce-app-ccnh.onrender.com/addtocart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,7 +72,7 @@ const ShopContextProvider = (props) => {
 
     if (isLoggedIn) {
       try {
-        await fetch("http://localhost:3300/removefromcart", {
+        await fetch("https://ecommerce-app-ccnh.onrender.com/removefromcart", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -93,7 +93,7 @@ const ShopContextProvider = (props) => {
       if (!token) return;
 
       try {
-        const res = await fetch("http://localhost:3300/getcart", {
+        const res = await fetch("https://ecommerce-app-ccnh.onrender.com/getcart", {
           headers: {
             "auth-token": token,
           },
@@ -123,7 +123,7 @@ const ShopContextProvider = (props) => {
   useEffect(() => {
     const token = localStorage.getItem("auth-token");
     if (token) {
-      fetch("http://localhost:3300/getcart", {
+      fetch("https://ecommerce-app-ccnh.onrender.com/getcart", {
         headers: { "auth-token": token },
       })
         .then((res) => res.json())
