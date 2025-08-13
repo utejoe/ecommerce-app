@@ -1,34 +1,9 @@
-import React, { useContext } from 'react';
-import './CartItems.css';
-import { ShopContext } from '../../Context/ShopContext';
-import remove_icon from '../Assets/cart_cross_icon.png';
-
+import React, { useContext } from 'react'
+import './CartItems.css'
+import { ShopContext } from '../../Context/ShopContext'
+import remove_icon from '../Assets/cart_cross_icon.png'
 const CartItems = () => {
-  const { getTotalCartAmount, all_product, cartItems, removeFromCart } = useContext(ShopContext);
-
-  // ✅ Move checkout logic here, outside the .map()
-  const handleCheckout = async () => {
-    const items = all_product
-      .filter(e => cartItems[e.id] > 0)
-      .map(e => ({
-        name: e.name,
-        price: e.new_price,
-        quantity: cartItems[e.id],
-      }));
-
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/create-checkout-session`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items }),
-      });
-      const data = await res.json();
-      window.location.href = data.url; // Redirect to Stripe Checkout
-    } catch (error) {
-      console.error("Checkout error:", error);
-    }
-  };
-
+    const { getTotalCartAmount, all_product, cartItems, removeFromCart } = useContext(ShopContext);
   return (
     <div className="cartitems">
       <div className="cartitems-format-main">
@@ -36,7 +11,7 @@ const CartItems = () => {
         <p>Title</p>
         <p>Price</p>
         <p>Quantity</p>
-        <p>Total</p>
+        <p>total</p>
         <p>Remove</p>
       </div>
       <hr />
@@ -63,7 +38,7 @@ const CartItems = () => {
             </div>
           );
         } else {
-          return null;
+          return null; // Always return something (even null) to avoid undefined issues
         }
       })}
       <div className="cartitems-down">
@@ -85,11 +60,10 @@ const CartItems = () => {
               <h3>${getTotalCartAmount()}</h3>
             </div>
           </div>
-          {/* ✅ Call handleCheckout here */}
-          <button onClick={handleCheckout}>PROCEED TO CHECKOUT</button>
+          <button>PROCEED TO CHECKOUT</button>
         </div>
         <div className="cartitems-promocode">
-          <p>If you have a promo code, Enter it here</p>
+          <p>if you have a promo code, Enter it here</p>
           <div className="cartitems-promobox">
             <input type="text" placeholder="promo code" />
             <button>Submit</button>
@@ -98,6 +72,6 @@ const CartItems = () => {
       </div>
     </div>
   );
-};
+}
 
-export default CartItems;
+export default CartItems
