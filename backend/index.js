@@ -541,6 +541,25 @@ app.post("/save-profile-image", async (req, res) => {
 
 
 
+const axios = require("axios");
+
+app.get("/verify-payment/:reference", async (req, res) => {
+  try {
+    const response = await axios.get(
+      `https://api.paystack.co/transaction/verify/${req.params.reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        },
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    res.status(400).json(error.response.data);
+  }
+});
+
+
 
 
 // Start server
