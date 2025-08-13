@@ -11,7 +11,6 @@ const CartItems = () => {
   const publicKey = process.env.REACT_APP_PAYSTACK_PUBLIC_KEY;
   const amount = getTotalCartAmount() * 100; // Paystack wants amount in Kobo
   const email = "customer@example.com"; // Replace with logged-in user email
-  const name = "Customer Name"; // Replace with logged-in user name
 
   const componentProps = {
     email,
@@ -53,15 +52,14 @@ const CartItems = () => {
                   className="cartitems-remove-icon"
                   src={remove_icon}
                   onClick={() => removeFromCart(e.id)}
-                  alt=""
+                  alt="remove"
                 />
               </div>
               <hr />
             </div>
           );
-        } else {
-          return null;
         }
+        return null;
       })}
       <div className="cartitems-down">
         <div className="cartitems-total">
