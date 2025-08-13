@@ -1,3 +1,4 @@
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 require("dotenv").config();
 const PORT = process.env.PORT || 3000;
 const express = require("express");
